@@ -1,0 +1,327 @@
+\documentclass{article}
+
+\usepackage[spanish]{babel}
+\usepackage{listings}
+\usepackage{epsfig} 
+\usepackage{hyperref}
+\usepackage{color}
+%\usepackage{multicol}
+%\usepackage{url}
+%\renewcommand{\UrlFont}{\small}
+\setlength{\parskip}{3mm}
+\setlength{\parindent}{0pt}
+\title{Tarea 1}
+\date{25 de febrero 2019}
+\author{001985269 }
+%\institute{PISIS UANL}
+%\email{dicoro993@gmail.com}
+
+
+
+\begin{document}
+\maketitle
+
+
+\section{Introducción}
+Este informe pretende realizar un an\'alisis de las distintas formas de posicionamiento que ofrece la librer\'ia NetworkX. Es importante destacar el papel que juega la representaci\'on en teor\'ia de grafos. Una correcta representaci\'on puede facilitar el análisis del problema.
+
+La librería NetworkX contiene varios algoritmos de ordenamiento estos siguen distintos principios de posicionamiento de los nodos. Precisamente por estas diferencias es que dichos métodos no resultan útiles para todos los problemas que se pretenden representar con teoría de grafos.
+
+A continuación se presentara un comparación, los grafos generados sin especificar m\'etodos de ordenamiento ser\'an obtenidos ahora usando el layout mas conveniente en cada caso.
+
+Como parte de este breve preámbulo se enumeran los tipos de ordenamientos utilizados.
+$random//spring//spectral//circular//pipartite//kamada_kawai//shell$
+ 
+
+\section{Grafo simple no dirigido acíclico}
+
+En la figura \ref{uni} de la página \pageref{uni} se muestra un grafo que representa un problema de un árbol de expansión. Es evidente que no existen ciclo ya que no hay forma de partir de un nodo y escoger un recorrido que regrese al origen. Este grafo puede representar un árbol de expansión de una red eléctrica donde el nodo origen es el n\'umero 1 y este va alimentando al dos y al tres que a su vez alimentan a otros.
+
+Para la representaci\'on de este grafo se utilizaron tres algoritmos de ordenamiento con el objetivo de hacer una comparaci\'on. En el primer las posiciones de los nodos fueron generadas de forma aleatoria \ref{uni} de la página \pageref{uni}, mientras que en el segundo fueron posicionados usando el $circular_layout$ \ref{2} de la página \pageref{2}. Como es posible observar en estos dos ejemplos la forma en que la red est\'a representada no  la comprenci\'on del problema sobre todo por los entrecruzamiento entre los v\'ertices.
+
+Es por esto que se hace una misma representaci\'on con $spring_layout$ \ref{3} de la página \pageref{3}. En esta ocaci\'on se solucionan los problemas de entrecruzamiento. Este m\'etodo se basa en encontrar una distribuci\'on tal que los nodos tienen una carga y el objetivo es que estos se encuentren interactuando según su carga que define el acomodo de los nodos.   
+
+
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ 
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  firstnumber=1,                % start line enumeration with line 1000
+  frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+\begin{lstlisting}[frame=single]
+import networkx as nx
+import matplotlib.pyplot as plt
+G=nx.Graph()
+G.add_edges_from([(1,2),(1,3), (3,4),(3,5),(4,10),(5,8),(2,6), (6,11), (2,7), (7,12)]) 
+nx.draw(G, with_labels=True, pos=nx.spring_layout(G), edge_color='black', node_color='gray',node_size=1000, edgecolors='black', font_weight='bold')
+G.number_of_nodes() 
+plt.savefig('grafoNAS.eps', format='eps', dpi=1000)
+\end{lstlisting}
+
+\begin{figure}[h]
+\centering
+\includegraphics [width=80mm] {primero.eps}
+\caption{Grafo no dirigido acíclico}
+
+\label{uni}
+\end{figure}
+\begin{figure}[h]
+\centering
+\includegraphics [width=80mm] {primeroc.eps}
+\caption{Grafo no dirigido acíclico}
+\label{2}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics [width=80mm] {primerospring.eps}
+\caption{Grafo no dirigido acíclico}
+\label{3}
+\end{figure}
+
+
+\section{Grafo simple no dirigido cíclico}
+La figura \ref{4} de la página \pageref{4} representa un grafo que puede ajustarse a un problema ampliamente conocido y estudiado, el problema del agente viajero. Este problema consiste en recorrer cada uno de los nodos una vez, minimizando la distancia total. Este es resulta un problema de optimizaci\'on combinatoria y esta comprendido dentro del grupo NP duro. Esto muestra a lo que hac\'iamos referencia cuando se enunci\'o que la existencia de ciclos complejiza el problema. Ya que en problemas como estos aunque el numero de soluciones factibles son finitas con el crecimiento del numero de nodos se hace improbable encontrar un algoritmo que arroje una solución en tiempo polinomial.
+
+Este es n ejemplo en el cual funcional utilizar $kamada_kawai_layout$ \ref{5} de la página \pageref{5} ya que si se realiza una comparaci\'on entre este y la figura anterior puede ser concluido como se eliminan buena parte de los entrecruzamientos, y es que este algoritmo precisamente persigue este objetivo.
+
+  
+\begin{lstlisting}[frame=single]
+G=nx.Graph()
+G.add_edges_from([(1,2),(2,3), (3,4),(4,5),(5,6),(6,7),(7,8), (8,1)]) 
+\end{lstlisting}
+\begin{figure}[h]
+\centering
+\includegraphics [width=80mm] {segundocircular.eps}
+\caption{Grafo no dirigido cíclico}
+\label{4}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics [width=80mm] {segundokamada.eps}
+\caption{Grafo no dirigido acíclico}
+\label{5}
+\end{figure}
+
+
+
+\section{Grafo simple no dirigido reflexivo}
+En este caso se representan los nodos reflexivos con el color rojo, este grafo podr\'ia representar un grupo de tareas que se complementan entre si y no importa el orden en que se realicen. Adem\'as  las tareas representadas por los nodos reflexivos cuentan con un reproceso en caso de que sea necesario garantizar mayor calidad en el producto final figura \ref{6} en la p\'agina 
+\pageref{6}.
+
+\newpage
+
+\begin{lstlisting}[frame=single]
+import networkx as nx
+import matplotlib.pyplot as plt
+G=nx.Graph()
+G.add_edges_from([(1,2), (1,1), (2,3), (3,4), (4,1), (1,3), (2,4)]) 
+node1 = {1,2}
+node2 = {3,4}
+pos = {1:(200, 350), 2:(550,350), 3:(650, 220), 4:(400,100), 5:(150,220)}
+nodes=nx.draw_networkx_nodes(G, pos, with_labels=True, nodelist=node1,node_size=400, node_color='r', node_shape='o')
+nodes=nx.draw_networkx_nodes(G, pos, with_labels=True, nodelist=node2,node_size=400, node_color='grey', node_shape='o')
+nodes=nx.draw_networkx_edges(G, pos)
+nx.draw_networkx_labels(G, pos)
+plt.savefig('tercero con numeros.eps', format='eps', dpi=1000)
+\end{lstlisting}
+\begin{figure}[h]
+\centering
+\includegraphics [width=80mm] {tercero.eps}
+\caption{Grafo no dirigido reflexivo}
+\label{6}
+\end{figure}
+
+\section{Grafo simple dirigido acíclico}
+Con este tipo de grafos pueden ser representados redes de distribuci\'on el\'ectrica comenzando por un nodo principal que alimenta a un grupo de nodos secundarios que a su vez alimentan a otros figura \ref{7} p\'agina \pageref{7}.
+
+Para la representaci\'on en este caso fueron utilizados $circular_layout$,$random_layout$ y $shell_layuot$; Este \'ultimo funciona ordenando los nodos en circunferencias conc\'entricas de distintos radios haciendo capas. Este algoritmo no elimina los entrecruzamientos.
+  
+\begin{lstlisting}[frame=single]
+G=nx.DiGraph()
+G.add_edges_from([(1,2),(2,4), (2,3), (2,5), (5,6), (5,7)]) 
+\end{lstlisting}
+\begin{figure}[h]
+\centering
+\includegraphics [width=80mm] {cuartorandom.eps}
+\caption{Grafo dirigido acíclico}
+\label{7}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics [width=80mm] {cuartocircular.eps}
+\caption{Grafo dirigido acíclico}
+\label{8}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics [width=80mm] {cuartoshell.eps}
+\caption{Grafo dirigido acíclico}
+\label{9}
+\end{figure}
+\section{Grafo simple dirigido cíclico}
+El grafo mostrado en la figura \ref{10} p\'agina \pageref{10} pudiera corresponder a una red de rutas de una ciudad donde tomando la primera ruta ser\'ia posible llegar a las rutas 2 y 3 y de esta forma como expresa la figura. Como podemos observa los v\'ertices se encuentran unidos por aristas que tienen una direcci\'on esto hace se reduzcan las variantes de mover flujo por el grafo.
+
+\begin{lstlisting}[frame=single]
+G=nx.DiGraph()
+G.add_edges_from([(1,2),(2,3), (3,4), (1,3), (4,1)]) 
+\end{lstlisting}
+
+
+\begin{figure}[h]
+\centering
+\includegraphics [width=80mm] {quintokamada.eps}
+\caption{Grafo no dirigido acíclico}
+\label{10}
+\end{figure}
+
+\section{Grafo simple dirigido reflexivo}
+Imaginemos que tenemos una linea de producci\'on con N procesos que quedan representados cada uno por un nodo, se conoce que los procesos 1 y 2 son obligatorios. Pero para obtener el producto deseado es necesario continuar  entonces debe ser tomada la decisi\'on de continuar con el proceso 3 o el 6 y asi de esta manera hasta recorrer todos los nodos figura \ref{11} p\'agina \pageref{11}.
+
+\begin{lstlisting}[frame=single]
+G=nx.DiGraph()
+G.add_edges_from([(1,2),(2,3), (3,4)])
+node1 = {1,2}
+node2 = {3,4}
+pos = {1:(200, 350), 2:(550,350), 3:(650, 220), 4:(400,100), 5:(150,220)}
+nodes=nx.draw_networkx_nodes(G, pos, with_labels=True, nodelist=node1,node_size=400, node_color='r', node_shape='o')
+nodes=nx.draw_networkx_nodes(G, pos, with_labels=True, nodelist=node2,node_size=400, node_color='grey', node_shape='o')
+nodes=nx.draw_networkx_edges(G, pos)
+nx.draw_networkx_labels(G, pos)
+plt.savefig('tercero con numeros.eps', format='eps', dpi=1000) 
+\end{lstlisting}
+\begin{figure}[h]
+\centering
+\includegraphics [width=80mm] {sexto.eps}
+\caption{Grafo simple dirigido reflexivo}
+\label{11}
+\end{figure}
+
+\section{Multigrafo no dirigido acíclico}
+
+Pudiéramos interpretar este grafo figura \ref{12} p\'agina \pageref{12} como la conexi\'on entre calles, donde existen dos maneras distintas de unirlas a excepci\'on del nodo 4. 
+
+\begin{lstlisting}[frame=single]
+G=nx.MultiGraph()
+G.add_edges_from([(1,2), (2,1), (2,3,), (3,2,), (3,4,)]) 
+\end{lstlisting}
+\begin{figure}[h]
+\centering
+\includegraphics [width=80mm] {septimo.eps}
+\caption{Multigrafo no dirigido acíclico}
+\label{12}
+\end{figure}
+
+
+\section{Multigrafo no dirigido cíclico}
+Imaginemos que tenemos representado cuatro procesos que generan informaci\'on y que la informaci\'on generada por cada uno debe ser compartida. Con este fin se conoce que de un proceso a otro (nodos) existen dos variantes de enviar la informaci\'on. Ahora bien cada variante tiene un tiempo de transmici\'on distinto. El objetivo definido por los decisores ser\'aminimizar este tiempo. 
+Este problema queda representado por el grafo del la figura \ref{13} en la pagina \pageref{13}. Donde los nodos representan cada uno de los procesos y las aristas las variantes.
+
+\begin{lstlisting}[frame=single]
+G=nx.MultiGraph()
+G.add_edges_from([(1,2), (2,1), (2,3,), (3,2,), (3,4,), (4,1), (1,4),(4,2),(2,4),(3,1),(1,3)]) 
+\end{lstlisting}
+\begin{figure}
+\centering
+\includegraphics [width=80mm] {octavobipartite.eps}
+\caption{Multigrafo no dirigido cíclico}
+\label{13}
+\end{figure}
+
+
+\section{Multigrafo no dirigido reflexivo}
+Ahora imaginemos que nos encontramos en una situaci\'on parecida que la secci\'on anterior. Pero resulta que los procesos 1 y 2 necesitan la infromaci\'on que ellos mismos generan para realizar controles. Y anteriormente la mandaban a los otros procesos para que fuera procesada. Si se valorara la opci\'on de que esta fuera estudiada en el mismo proceso con un tiempo de procesamiento determinado. Estaríamos en presencia del problema representado por el grafo de la figura \ref{14} en la pagina \pageref{14}. 
+
+\begin{lstlisting}[frame=single]
+G=nx.MultiGraph()
+G.add_edges_from([(1,2),(1,1),(2,1),(2,2),(2,3,), (3,2,), (3,4,), (4,1), (1,4)]) 
+\end{lstlisting}
+\begin{figure}
+\centering
+\includegraphics [width=80mm] {novenospectral.eps}
+\caption{Multigrafo no dirigido acíclico}
+\label{14}
+\end{figure}
+
+
+
+
+\section{Multigrafo dirigido acíclico}
+Supongamos que una empresa cuenta con 3 almac\'en desde el cual tiene que transportar las mercanc\'ias a dos clientes, pero antes esta debe pasar por controles de calidad para lo cual es transportada hacia la sede principal. Si sabemos que la capacidad de cada viaje es limitada y dependiente del n\'umero de veh\'iculos. Nos encontramos con un problema de transporte que esta representado por el grafo de la figura \ref{15} en la p\'agina \pageref{15}. Donde los nodos A=[4,5,6] S=[2] C=[1,3]  representan los almacenes, la empresa y los clientes respectivamente.  
+\begin{lstlisting}[frame=single]
+G=nx.MultiDiGraph()
+G.add_edges_from([(1,2),(2,1),(2,3),(3,2),(4,2),(5,2), (6,2)])  
+\end{lstlisting}
+
+\begin{figure}
+\centering
+\includegraphics [width=80mm] {decimo.eps}
+\caption{Multigrafo dirigido acíclico}
+\label{15}
+\end{figure}
+
+
+\section{Multigrafo dirigido cíclico}
+Retomemos ahora el problema del TSP, en este problema los nodos estan unidos por aristas que no necesariamente deben de estar dirigidas, ya que pueden ser usadas en ambas direcciones. Pero si a las posible le agregamos varias rutas que unen los destinos y a su vez estas tienen un solo destino, este problema es representado por un multigrafo dirigido c\'iclico figura \ref{16} pagina \pageref{16}. 
+
+\begin{lstlisting}[frame=single]
+G=nx.MultiDiGraph()
+G.add_edges_from([(1,2),(2,1),(2,1),(2,3),(3,2),(3,2),(3,4),(4,3),(4,3),(4,1),(1,4),(4,2),(2,4),(3,1),(1,3)])) 
+\end{lstlisting}
+\begin{figure}
+\centering
+\includegraphics [width=80mm] {onceavo.eps}
+\caption{Multigrafo no dirigido cíclico}
+\label{16}
+\end{figure}
+
+
+\section{Multigrafo dirigido reflexivo}
+Supongamos que una linea de producci\'on fabrica 4 componentes distintos pero solo puede ser producido un componente a la vez. Por esto cuando se desee fabricar otro hay que parar la producci\'on y cambiar la configuraci\'on lo cual conlleva un tiempo de ejecuci\'on. Ademas linea deber\'a parar cada ciertos periodos de tiempo por mantenimientos preventivos, y cada vez que pare se deber\'a re-configurar ya que fue reiniciada. Este problema se puede plantear como un TSP pero adem\'as como existe la posibilidad de que luego del mantenimiento se vuelva a usar la misma configuraci\'on se vuelve un problema representado por un Multigrafo dirigido reflexivo como el de la figura \ref{17} de la p\'agina \pageref{17}.
+
+\begin{lstlisting}[frame=single]
+G=nx.MultiDiGraph()
+G.add_edges_from([(1,2), (2,1), (2,3), (3,2), (3,4), (4,3), (4,1), (1,4)])
+\end{lstlisting}
+\begin{figure}
+\centering
+\includegraphics [width=80mm] {doceavo.eps}
+\caption{Multigrafo dirigido reflexivo}
+\label{17}
+\end{figure}
+
+\bibliographystyle{IEEEtran}
+\bibliography{bibliography}
+
+
+\end{document}
