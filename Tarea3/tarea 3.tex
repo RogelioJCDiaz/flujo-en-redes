@@ -1,0 +1,292 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage[spanish]{babel}
+\selectlanguage{spanish}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{dsfont}
+\usepackage{multirow}
+\usepackage{vmargin}
+\usepackage{subfigure}
+\usepackage[numbers, sort&compress]{natbib}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{wrapfig}
+\usepackage{enumerate} 
+\usepackage{sectsty} % centrar secciones de encabezados
+\usepackage[usenames]{color}
+\usepackage{caption}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{algpseudocode}
+\usepackage{multirow}
+\usepackage[usenames]{color}
+\usepackage{epstopdf}
+\usepackage{float}
+\usepackage{nameref}
+\spanishdecimal{.}
+\title{Tarea 3}
+\date{\today}
+\author{1985269}
+
+
+
+
+\begin{document}
+\maketitle
+
+
+\section{Resumen}
+Fueron escogidos cinco algoritmos de la librer\'ia NetworkX, cada uno de estos resolvi\'o cinco problemas generados de forma aleatoria. Fueron realizadas 30 replicas durante un segundo para cada problema con cada algoritmo. A continuaci\'on se muestra la informaci\'on recolectada a partir del an\'alisis de los tiempos de procesamiento. 
+
+
+ 
+
+\section{Deep first search tree}
+En los datos  figura \ref{1},\ref{2},\ref{3} pueden ser obsevardos la densidad con la que se distribuyen los tiempos medios que demora este algoritmo para resolver cuatro de los cinco problemas generados. Cada uno las gr\'aficas muestran que el comportamiento de los datos no sigue un distribuci\'on normal y pesentan datos at\'ipicos y saltos en los intervalos de frecuencia.
+
+A continuaci\'on se comparte el c\'odigo de Python con el que se recopilaci\'on la informaci\'on:
+\newpage
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ 
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  firstnumber=1,                % start line enumeration with line 1000
+  frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+\begin{lstlisting}[frame=single]
+Graf=nx.Graph()
+rog=0
+diccionario_inst_Shortest_path={}
+while rog<=4:
+    Graf.clear()
+    rango=random.randint(random.randint(10,len(matrizadd)),len(matrizadd))
+    for i in range(rango):
+        for j in range(rango):
+            if matrizadd[i,j]!=0:
+                matrizadd[j,i]=0
+                #Graf.add_weighted_edges_from([(i,j,matrizadd[i,j])])
+                Graf.add_edges_from([(i,j)])
+    cont=0
+    lista_tiempos=[] 
+    lista_tiempos_completos={}    
+    tiempo_de_paro=0
+    tiempo_inicial=0
+    tiempo_final =0 
+    tiempo_ejecucion=0    
+    for r in range(30):
+        lista_tiempos_completos[r+1]=[]
+        tiempo_de_paro=0    
+        while tiempo_de_paro<1:            
+            tiempo_inicial = time()             
+            nx.shortest_path(Graf, source=None, target=None, weight=None, method='dijkstra')           
+            tiempo_final = time()  
+            tiempo_ejecucion = tiempo_final - tiempo_inicial        
+            if tiempo_ejecucion>0.0:
+                lista_tiempos_completos[r+1].append((tiempo_ejecucion*10000))  
+            tiempo_de_paro+=tiempo_ejecucion  
+    guardar_n_e[rog]=[]
+    diccionario_inst_Shortest_path[rog]=[]
+    for i in lista_tiempos_completos.keys():
+         media=np.mean(lista_tiempos_completos[i])
+         diccionario_inst_Shortest_path[rog].append(media)
+    guardar_n_e['nodos'].append(len(Graf.nodes))
+    guardar_n_e['edges'].append(len(Graf.edges))  
+    guardar_n_e['media'].append(np.mean(diccionario_inst_Shortest_path[rog]))
+    guardar_n_e['desv'].append(np.std(diccionario_inst_Shortest_path[rog]))
+    rog+=1 
+\end{lstlisting}
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {violindfstree.eps}
+\caption{Violinplot dfstree}
+\label{1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {boxplotdfstree.eps}
+\caption{Boxplot dfstree}
+\label{2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {dfstre.eps}
+\caption{dfstree}
+\label{3}
+\end{figure}
+
+\section{Greedy color}
+
+En este caso la mayor\'ia de los datos figuras  \ref{4},\ref{5},\ref{6} se encuentran en un intervalo con observaciones aisladas en otro intervalo mayor.  Tampoco hay normalidad y existe un sesgo a la izquierda.
+  
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {violingreedycolor.eps}
+\caption{Violinplot greedy color}
+\label{4}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {boxplotgreedycolor.eps}
+\caption{Boxplot greedy color}
+\label{5}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics [width=80mm] {greedycolor.eps}
+\caption{Greedy color}
+\label{6}
+\end{figure}
+
+
+\section{Maximun flow}
+
+De forma parecida las figuras muestran  \ref{7},\ref{8},\ref{9} como los datos se encuentran en intervalos separados y no siguen una distribucion precisa, no se aprecia ninguna relaci\'on con las caracter\'istica de la instancia.
+
+
+
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {violinmaximunflow.eps}
+\caption{Violinplot maximun flow}
+\label{7}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {boxplotmaximunflow.eps}
+\caption{Boxplot maximun flow}
+\label{8}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {maximunflow.eps}
+\caption{Maximun flow}
+\label{9}
+\end{figure}
+
+
+\section{Shortest path}
+En esta ocaci\'on vemos una mayor difenrencia entre los tiempos promedios de ejecucio\'on aun asi de estos no se infiere ningun comportamiento de probabilidad.
+
+
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {violinShortestpath.eps}
+\caption{Violinplot Shortest path}
+\label{10}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {boxplotShortestpath.eps}
+\caption{Boxplot Shortest path}
+\label{11}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {Shortestpath.eps}
+\caption{Shortestpath}
+\label{12}
+\end{figure}
+
+
+\section{Spanning tree}
+Las gr\'aficas  \ref{16},\ref{17},\ref{18} \ref{19} corresponden a las medias con las desviaciones extandar de cada uno de los problemas resueltos con un algoritmo representado por una figura de un color.  Los algoritmos para determinar la distancia m\'as corta entre dos nodos as\'i como el m\'aximo flujo son los m\'as sensibles al tiempo cuando aumenta la cantidad de nodos y v\'ertices del grafo. En ambos casos v\'ertices vs tiempo y nodos vs tiempo se realiz\'o un acercamiento en la zona donde se concentran la mayor\'ia de los tiempos medios entre $(9.725;9.9775)$.
+\begin{figure}[h]
+
+
+\centering
+\includegraphics [width=80mm] {violinspanningtree.eps}
+\caption{Violinplot spanning tree}
+\label{13}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {boxplotspanningtree.eps}
+\caption{Boxplot spanning tree}
+\label{14}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {minimumspanningtree.eps}
+\caption{Spanning tree}
+\label{15}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {errorsbars.eps}
+\caption{Errors bars nodes}
+\label{16}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {errorsbars3.eps}
+\caption{Errors bars nodes}
+\label{17}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {errorsbarsedges.eps}
+\caption{Errors bars edges}
+\label{18}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {errorsbarsedges3.eps}
+\caption{Errors bars edges}
+\label{19}
+\end{figure}
+
+\bibliographystyle{unsrt}
+\bibliography{nuevo}
+\nocite{*}
+\end{document}
