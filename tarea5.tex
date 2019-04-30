@@ -1,0 +1,280 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage[spanish]{babel}
+\selectlanguage{spanish}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{dsfont}
+\usepackage{multirow}
+\usepackage{vmargin}
+\usepackage{subfigure}
+\usepackage[numbers, sort&compress]{natbib}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{wrapfig}
+\usepackage{enumerate} 
+\usepackage{sectsty} % centrar secciones de encabezados
+\usepackage[usenames]{color}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{fancyvrb}
+\usepackage{caption}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{algpseudocode}
+\usepackage{multirow}
+\usepackage[usenames]{color}
+\usepackage{epstopdf}
+\usepackage{float}
+\usepackage{nameref}
+\spanishdecimal{.}
+\title{Tarea 5}
+\date{\today}
+\author{1985269}
+
+
+
+
+\begin{document}
+\maketitle
+
+\section{Descripci\'on del experimento}
+Fueron generados cinco grafos de \'ordenes distintos, luego fueron escogidos dos nodos entre los cuales se calcul\'o el m\'aximo flujo que puede transportarse de uno a otro. Este procedimiento fue repetido con varios pares de nodos y en cada una de las repeticiones se determinaron los coeficientes de argupamiento (clustering), centralidad (closeness centrality, load, centrality),  exentricidad (eccentricity) etc. Los pesos de las aristas fueron asignados siguiendo una ditribuci\'on normal. El objetivo de este experimento es determinar si existe alguna relaci\'on entre dichos coeficientes y el valor de la funci\'on objetivo o con el tiempo de ejecuci\'on. As\'i como determinar cuales son los mejores nodos fuentes y sumideros. 
+
+
+\section{Gederador de grafos}
+Fue utilizado el generador Watts–Strogatz small-world, este genera conexiones con una probabilidad predefinida. Se encuentra cierta similitud entre la manera en la que se genera este grafo con asentamientos poblacionales donde alrededor de las ciudades con una probabilidad mayor se fundan nuevos asentamientos y el flujo podr\'ia verse como el comercio.
+
+
+A continuaci\'on se comparte el c\'odigo de Python con el que se recopil\'o la informaci\'on:
+\newpage
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ 
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  firstnumber=1,                % start line enumeration with line 1000
+  frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+\begin{lstlisting}[frame=single]
+for i in range(5):
+    rango=random.randint(ordenes[i],ordenes[i]*2)
+    #G=nx.dense_gnm_random_graph(ordenes[i],rango)
+    G=nx.watts_strogatz_graph(ordenes[i], int(ordenes[i]/2) , 0.33 , seed=None)
+    lista=[]
+    lista[:]=G.edges
+    width=np.arange(len(lista)*1,dtype=float).reshape(len(lista),1)
+    for r in range(len(lista)):
+        R=np.random.normal(loc=20, scale=5.0, size=None)
+        width[r]=R
+        G.add_edge(lista[r][0],lista[r][1],capacity=R)
+    for w in range(ordenes[i]):
+        initial=final=0        
+        while initial==final:
+            initial=random.randint(0,round(len(G.nodes)/2))
+            final=random.randint(initial,len(G.nodes)-2)
+            
+        
+        tiempo_inicial=time()
+        T=nx.maximum_flow(G, initial, final)
+        tiempo_final =time()
+        tiempo_ejecucion=tiempo_final- tiempo_inicial
+        
+        data[contador,2]=nx.clustering(G, nodes=initial)
+        data[contador,3]=nx.load_centrality(G, v=initial)
+        data[contador,4]=nx.closeness_centrality(G, u=initial)
+        data[contador,5]=nx.eccentricity(G, v=initial)
+        data[contador,6]=nx.pagerank(G, alpha=0.9)[initial]
+#-------------------------------------------------------------------------------------------------------------#
+        data[contador,7]=nx.clustering(G, nodes=final)
+        data[contador,8]=nx.load_centrality(G, v=final)
+        data[contador,9]=nx.closeness_centrality(G, u=final)
+        data[contador,10]=nx.eccentricity(G, v=final)
+        data[contador,11]=nx.pagerank(G, alpha=0.9)[final]
+#--------------------------------------------------------------------------------------------------------------#
+        data[contador,0]=T[0]
+        data[contador,1]=tiempo_ejecucion
+        data[contador,12]=ordenes[i]
+        contador+=1 
+\end{lstlisting}
+
+
+
+
+\section{Visualizaci\'o de los grafos Grafo }
+A continuaci\'on se presentan los grafos generados, los nodos marcados con formas y colores representan la fuente y el sumidero con verde y rojo respentivamente. Las aristas azules representan el flujo y su anchora es proporcional a su capacidad. Es posible observar como los grafo tienen ordenes distintos.
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {gif1_10.eps}
+\caption{Grafo no dirigido cíclico de orden 10}
+\label{1}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {gif11_20.eps}
+\caption{Grafo no dirigido cíclico de orden 20}
+\label{2}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {gif31_30.eps}
+\caption{Grafo no dirigido cíclico de orden 30}
+\label{3}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {gif61_40.eps}
+\caption{Grafo no dirigido cíclico de orden 40}
+\label{4}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {gif101_50.eps}
+\caption{Grafo no dirigido cíclico de orden 50}
+\label{5}
+\end{figure}
+
+\section{An\'alisis de los datos}
+Los gr\'aficos de caja y bigotes  muestran como los datos obtenidos para cada uno de los nodos presentan ciertas similitudes, esto producto a que dependen del generador utilizado, es decir si fuera realizado un an\'alisis entre distintos generadores resultar\'ia una relaci\'on entre ellos y las caractir\'istias medidas para los nodos. El tiempo de ejecuci\'on registrado para el algoritmo de flujo m\'aximo es pequeño para el tamaño de las instancias estudiadas.  En la matriz de correlaciones el tiempo fila, columna 1 no se encuentra correlacionado fuertemente con ning\'una otra variable, esto ser\'a ratificado m\'as adelante. Aun as\'i s\'i existen correlaciones fuertes entre las otras variables.
+
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {closeness.eps}
+\label{6}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {clustering.eps}
+\label{7}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {load.eps}
+\label{8}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {prank.eps}
+\label{9}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {tiempo.eps}
+\label{12}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=80mm] {Correlaciones.eps}
+\label{13}
+\end{figure}
+
+
+\section{An\'alisis de varianza}
+Se realiz\'o una prueba ANOVA para demostrar desigualdad entre las medias. Como indican los resultados de la prueba los valores $p$ son pequeños las medias no son iguales, por lo cual se procedi\'o a utilizar una prueba de m\'inimos cuadrados ordinarios a ver si con las variables resgistradas se pueden explicar los valores de la funci\'on objetivo.
+
+
+\RecustomVerbatimCommand{\VerbatimInput}{VerbatimInput}%
+{fontsize=\footnotesize,
+ frame=lines,  % top and bottom rule only
+ framesep=2em, % separation between frame and text
+ rulecolor=\color{Gray},
+ label=\fbox{\color{Black}ANOVA.txt},
+ labelposition=topline,
+ commandchars=\|\(\), % escape character and argument delimiters for
+                      % commands within the verbatim
+ commentchar=*        % comment character
+}
+\VerbatimInput{Anova.txt}
+
+\section{Mínimos cuadrados ordinarios}
+
+Los resultados de la regresi\'on indican que con las variables medidas es posible explicar el comportamiento de los valores del flujo m\'aximo con un error aceptable, el modelo hace una buena predicci\'on. Las variables clustering no son significativas en el modelo al igual que load y page rank sumidero. Las caractir\'isticas m\'as influyentes de los nodos fuentes son load, closensess y eccentricity mientras que los sumideros closeness y load en ese orden.
+
+En el segundo experimento se realiz\'o la misma prueba para el tiempo de ejecuci\'on y el resultado fue como se esperaba que el modelo no explica el comportamiento del tiempo ya que este depende de otras variables. Como se puede observar en la matriz de correlaci\'on el tiempo se correlaciona con el valor objetivo y esto tiene sentido ya que si existen varias aristas por las cuales pasa flujo la exploraci\'on es m\'as grande y el tiempo de ejecuci\'on aumenta.
+
+
+\RecustomVerbatimCommand{\VerbatimInput}{VerbatimInput}%
+{fontsize=\footnotesize,
+ frame=lines,  % top and bottom rule only
+ framesep=2em, % separation between frame and text
+ rulecolor=\color{Gray},
+ label=\fbox{\color{Black}OLS.txt},
+ labelposition=topline,
+ commandchars=\|\(\), % escape character and argument delimiters for
+                      % commands within the verbatim
+ commentchar=*        % comment character
+}
+\VerbatimInput{OLS.txt}
+
+\newpage 
+
+\RecustomVerbatimCommand{\VerbatimInput}{VerbatimInput}%
+{fontsize=\footnotesize,
+ frame=lines,  % top and bottom rule only
+ framesep=2em, % separation between frame and text
+ rulecolor=\color{Gray},
+ label=\fbox{\color{Black}Olsm.txt},
+ labelposition=topline,
+ commandchars=\|\(\), % escape character and argument delimiters for
+                      % commands within the verbatim
+ commentchar=*        % comment character
+}
+%\centering
+\VerbatimInput{Olst.txt}
+
+
+
+\section{Conclusiones}
+
+Fue realizada la experimentci\'on propuesta y los resultados fueron analizados, dicho an\'alisis arroj\'o que con las variables medidas es posible encontrar un modelo que explique el valor objetivo del algoritmo del flujo m\'aximo utilizado. Los mejores nodos fuentes son aquellos que tienen un mayor valor de load, closeness y eccentricity. Mientras que los mejores sumidero son aquellos que presentan mayor valor de closeness. Adem\'as se comprob\'o que no existe una correlaci\'on fuerte entre el tiempo de ejecuci\'on y estas variables aunque existe cierta relaci\'on positiva entre el tiempo y el valor del flujo m\'aximo.
+
+
+
+
+\bibliographystyle{unsrt}
+\bibliography{nuevo}
+\nocite{*}
+\end{document}
