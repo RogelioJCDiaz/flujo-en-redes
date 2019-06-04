@@ -1,0 +1,201 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage[spanish]{babel}
+\selectlanguage{spanish}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{dsfont}
+\usepackage{multirow}
+\usepackage{vmargin}
+\usepackage{subfigure}
+\usepackage[numbers, sort&compress]{natbib}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{wrapfig}
+\usepackage{enumerate} 
+\usepackage{sectsty} % centrar secciones de encabezados
+\usepackage[usenames]{color}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{fancyvrb}
+\usepackage{caption}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{algpseudocode}
+\usepackage{multirow}
+\usepackage[usenames]{color}
+\usepackage{epstopdf}
+\usepackage{float}
+\usepackage{nameref}
+\spanishdecimal{.}
+\title{Tarea 6}
+\date{\today}
+\author{1985269}
+
+
+
+
+\begin{document}
+\maketitle
+
+\section{Introducci\'on}
+El presente trabajo tiene como objetivo a partir de una red decidir cu\'ales son los mejores nodos hub as\'i como los nodos cr\'iticos que est\'an directamente relacionados con el flujo en la red. Un nodo hub logístico es el lugar donde se reúnen las cargas con la finalidad de ser redistribuidas, en pocas palabras es un puerto o aeropuerto que funcionan como centros de conexiones y distribución. Una red de transporte tiene una capacidad de flujo m\'axima entre cada uno de sus nodos y un costo asociado a dicho flujo. Un buen nodo hub es aquel que distribuye este flujo de forma tal que los costos sean los menores posibles.
+
+
+\section{Descripci\'on del experimento}
+Para determinar posibles nodos hubs se analiz\'o la variaci\'on del flujo m\'aximo, para lo cu\'al se gener\'o una red de doscientos nodos. Los nodos de menor grado fueron divididos y conectados con una fuente y un sumidero ficticios, a cada arista que se gener\'o se les asignaron capacidad infinita y costo cero. Las dem\'as aristas del grafo tienen un costo y una capacidad generadas aleatoriamente siguiendo una distribuci\'on normal.
+
+Fue calculado el m\'aximo flujo de la red desde la fuente hasta el sumidero y luego se fueron eliminando nodos distintos iterativamente para registrar la variaci\'on del flujo. De esta forma se determinan cu\'ales son los nodos mas influyentes en el flujo de la red. Este mismo procedimiento fue realizado con el costo para este se calcul\'o el camino m\'inimo y se encontraron los nodos que mayor variaci\'on del costo provocan al ser eliminados.
+
+Adem\'as fue realizada una b\'usqueda en anchura para determinar cu\'ales son los nodos mas conectados sumando la cantidad de conexiones hasta el segundo nivel de la b\'usdqueda. Los tres aspectos tenidas en cuenta fueron: conectividad, variaciones del flujo y de los costos. 
+
+
+
+\section{Variaci\'on del flujo}
+
+En la figura \fig{1} se muestra la red generada, el desvanecido de los nodos est\'a dado por el mayor de los costos de ir de un nodo hacia los dem\'as y fue calculado con un algoritmo de la librer\'ia NetworkX . 
+
+
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=150mm] {inicial.eps}
+\caption{Red de estudio}
+\label{1}
+\end{figure}
+
+
+A continuaci\'on se comparte el c\'odigo de Python del algoritmo utilizado para determinar las variaciones de flujo:
+
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ 
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  firstnumber=1,                % start line enumeration with line 1000
+  frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+\begin{lstlisting}[frame=single]
+T=nx.maximum_flow(G, 'fuente', 'sumidero')
+for i in range(rango):             
+     try:
+         H.remove_node(degree[i][1])
+         t=nx.maximum_flow(H,'fuente', 'sumidero')
+         H=G.copy()
+         desv.append((int(T[0]-t[0]),degree[i][1]))
+     except:
+          H=G.copy()
+          desv.append((999999,degree[i][1]))
+\end{lstlisting}
+
+Los resultado obtenidos se muestran en la figura \fig{3} los nodos con mayor intensidad de color son aquellos que al ser removidos del grafo tuvieron una mayor influencia en la varianci\'on del flujo. Los nodos de mayor intensidad se encuentran en las zonas m\'as densas del grafo, estos tienen un mayor n\'umero de conexiones y son candidatos claros a ser hubs ya que cumplen con dos de la condiciones definidas previamente. 
+
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=150mm] {grafo2.eps}
+\caption{Variaci\'on del flujo}
+\label{3}
+\end{figure}
+
+
+
+
+\section{Variaci\'on de los costos }
+El costo es otro de los indicadores a tener en cuenta. Se realiz\'o un an\'alisis similar al anterior pero esta vez se calcul\'o el camino m\'as corto entre cualesquiera par de nodos y se obtuvieron los resultados que muestra la figura \fig{4}. Nuevamente los que mayor variaci\'on provocan en la red, al ser removidos, son los nodos de mayor intensidad de color. En este caso tenemos menor concentraci\'on de nodos en las zonas densas del grafo. Aparecen nodos en la perifer\'ia que tienen un menor grado estos resultan ser nodos cr\'iticos ya que de eliminarlos los caminos m\'inimos tienen  una gran variaci\'on. Esto debido a que son los enlaces entre las zonas m\'as densas de la red.
+
+\newpage
+\begin{lstlisting}[frame=single]
+T=nx.shortest_path(G, 'fuente', 'sumidero', weight=True, method='dijkstra')
+for i in range(len(T)-1):    
+    Short+=H[T[i]][T[i+1]]['weight']
+for i in Grafo.nodes:
+     try:   
+         H.remove_node(degree[i][1])
+         t=nx.shortest_path(H, 'fuente', 'sumidero', weight=True, method='dijkstra')
+         for j in range(len(t)-1):    
+             short+=H[t[j]][t[j+1]]['weight']         
+         H=G.copy()
+         desv1.append((int(short-Short),degree[i][1]))
+     except:
+         H=G.copy()
+         desv1.append((9999999,degree[i][1]))
+\end{lstlisting}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=150mm] {grafo6.eps}
+\caption{Variaci\'on de los costos}
+\label{4}
+\end{figure}
+
+\section{Conectividad de los nodos }
+Por \'ultimo evaluaremos la condici\'on de conectividad para lo cual se realiz\'o una b\'usqueda en profundidad y se encontraron la cantidad de conexiones de cada nodo hasta el segundo nivel de la b\'usqueda. Nuevamente como era de esperar los nodos de mayor conectividad se encuentra en las zonas m\'as desnsas del grafo \fig{5}. 
+
+
+\begin{lstlisting}[frame=single]
+conect=[]
+for i in Grafo.nodes:
+    K=nx.bfs_tree(Grafo,i)
+    conectividad=0
+    for j in list(K[i]):
+        conectividad+=len(list(K[j]))
+    conect.append((conectividad+len(K[i]),degree[i][1]))    
+\end{lstlisting}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=150mm] {grafo3.eps}
+\caption{Nodos de mayor conectividad}
+\label{5}
+\end{figure}
+ 
+\section{Determinaci\'on de los posible hubs en la red}
+Ya teniendo los tres indicadores que describen el comportamiento de los nodos en cuanto a  variaci\'on del costo, variaci\'on del flujo m\'aximo y conectividad, se procedi\'o a encontrar los nodos que mejores caracter\'isticas tuvieran en los tres conjuntos. Cada una de las variaciones se calcul\'o de forma tal que los valores por nodo est\'an relacionados de manera directa con su importancia en la red, es decir a mayor valor de desviaci\'on el nodo en cuesti\'on es mejor candidato para hub. Para encontrar los nodos con mejores carater\'isticas fueron promediados los indicadores por nodos en la figura \fig{6} se muestra el resultado. As\'i es que al menos en cada zona densa del grafo hay un nodo candidato a hub, hay otro conjunto de nodos de menor grado que enlazan dichas zonas que de ser eliminados el comportamiento de la red cambia en cuanto al flujo o al costo.
+
+
+
+\begin{figure}[H]
+\centering
+\includegraphics [width=150mm] {final.eps}
+\caption{Mejores candidatos a nodos hubs}
+\label{6}
+\end{figure}
+
+\section{Conclusiones}
+Se caracterizaron los nodos seg\'un su influencia en el flujo, en el costo y por su conectividad. Se analiz\'o la red como un sistema y se definieron nodos cr\'iticos en cuanto al flujo y al costo. Finalmente se proponen como hubs una serie de nodos que cumplen con los tres supuestos propuestos inicialmente. Fue posible observar los efectos que provoca en la red eliminar cada nodo. Se propusieron al menos un nodo hub por cada una de las zonas m\'as densas en el grafo.
+
+
+\bibliographystyle{unsrt}
+\bibliography{nuevo}
+\nocite{*}
+\end{document}
